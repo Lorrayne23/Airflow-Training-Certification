@@ -1,4 +1,4 @@
-from airflow.models import DAG
+"""from airflow.models import DAG
 from airflow.decorators import task 
 from airflow.operators.python import get_current_context
 
@@ -31,7 +31,7 @@ def process_c():
     #partner_settings= ti.xcom_pull(task_ids="extract")
     #print(partner_settings['partner_name'])
     print(partner_name)
-    print(partner_path) 
+    print(partner_path)
 
 def subdag_factory(parent_dag_id, subdag_dag_id, default_args):
     with DAG(f"{parent_dag_id}.{subdag_dag_id}", default_args=default_args) as dag:
@@ -40,3 +40,4 @@ def subdag_factory(parent_dag_id, subdag_dag_id, default_args):
         process_c()
     
     return dag
+"""
