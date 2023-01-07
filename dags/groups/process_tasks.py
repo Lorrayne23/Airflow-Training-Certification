@@ -1,4 +1,4 @@
-from airflow.decorators import task , dag
+from airflow.decorators import task , dag , task_group
 from airflow.utils.task_group import TaskGroup
 
 @task.python
@@ -30,7 +30,8 @@ def check_c():
     print("checking")
 
 def process_tasks(partner_settings):
-    with TaskGroup(group_id='process_tasks') as process_tasks:
+    @task_group(group_id='process_tasks')
+    def process_tasks():
         with TaskGroup(group_id='test_tasks') as test_tasks:
             check_a()
             check_b()
