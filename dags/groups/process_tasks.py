@@ -31,11 +31,11 @@ def check_c():
 
 def process_tasks(partner_settings):
     with TaskGroup(group_id='process_tasks') as process_tasks:
-        process_a(partner_settings['partner_name'], partner_settings['partner_path'])
-        process_b(partner_settings['partner_name'], partner_settings['partner_path'])
-        process_c(partner_settings['partner_name'], partner_settings['partner_path'])
         with TaskGroup(group_id='test_tasks') as test_tasks:
             check_a()
             check_b()
             check_c()
+        process_a(partner_settings['partner_name'], partner_settings['partner_path']) >> test_tasks
+        process_b(partner_settings['partner_name'], partner_settings['partner_path']) >> test_tasks
+        process_c(partner_settings['partner_name'], partner_settings['partner_path']) >> test_tasks
     return process_tasks
