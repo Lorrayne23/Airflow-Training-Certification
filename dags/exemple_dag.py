@@ -16,5 +16,5 @@ default_args=default_args,catchup=False) as dag:
     t5 = DummyOperator(task_id="t5")
     t6 = DummyOperator(task_id="t6")
 
-    t2.set_upstream(t1)
-    t1.set_downstream(t2)
+   t2 << t1
+   t1 >> t2
