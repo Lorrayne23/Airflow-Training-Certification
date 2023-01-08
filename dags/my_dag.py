@@ -9,14 +9,7 @@ from airflow.operators.subdag import SubDagOperator
 from datetime import datetime , timedelta
 from airflow.utils.task_group import TaskGroup
 from groups.process_tasks import process_tasks
-
-
-
-
-@task.python(task_id="extract_partners",do_xcom_push=False,multiple_outputs=True)
-def extract(partner_name,partner_path):
-    return {"partner_name": partner_name,"partner_path": partner_path}
- 
+from airflow.operators.dummy import DummyOperator
 
 
 default_args = {
@@ -49,9 +42,15 @@ def my_dag():
     }
 
 }
-
+    start = DummyOperator(task_id="start")
     for partners, details in partners.items():
-        process_tasks(extract(details['name'], details['path']))
+
+        @task.python(task_id=f"extract_{partners}",do_xcom_push=False,multiple_outputs=True)
+        def extract(partner_name,partner_path):
+            return {"partner_name": partner_name,"partner_path": partner_path}
+        extracted_values = extract(details['name'], details['path'])
+        start >> extracted_values 
+        process_tasks(extracted_values )
 
 
    
