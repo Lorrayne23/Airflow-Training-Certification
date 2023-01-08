@@ -1,5 +1,6 @@
 from airflow.operators.dummy import DummyOperator
 from airflow import DAG
+from airflow.models.baseoperator import cross_downstream
 
 from datetime import datetime
 
@@ -15,6 +16,4 @@ default_args=default_args,catchup=False) as dag:
     t4 = DummyOperator(task_id="t4")
     t5 = DummyOperator(task_id="t5")
     t6 = DummyOperator(task_id="t6")
-
-   t2 << t1
-   t1 >> t2
+    cross_downstream([t1,t2,t3],[t4,t5,t6 ])
