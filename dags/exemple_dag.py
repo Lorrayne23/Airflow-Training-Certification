@@ -16,6 +16,10 @@ default_args=default_args,catchup=False) as dag:
     t4 = DummyOperator(task_id="t4")
     t5 = DummyOperator(task_id="t5")
     t6 = DummyOperator(task_id="t6")
+<<<<<<< HEAD
     #cross_downstream([t1,t2,t3],[t4,t5,t6 ])
+=======
+    cross_downstream([t1,t2,t3],[t4,t5,t6 ])
+>>>>>>> f63f7f10d12219d39143927a321f0eb10c794ff9
 
     chain(t1, [t2,t3], [t4,t5], t6)
