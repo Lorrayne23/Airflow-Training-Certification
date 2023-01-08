@@ -30,8 +30,7 @@ def check_c():
     print("checking")
 
 def process_tasks(partner_settings):
-    @task_group(group_id='process_tasks')
-    def process_tasks():
+    with TaskGroup(group_id='process_tasks',add_suffix_on_collision=True) as process_tasks:
         with TaskGroup(group_id='test_tasks') as test_tasks:
             check_a()
             check_b()

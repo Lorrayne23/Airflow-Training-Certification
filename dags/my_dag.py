@@ -10,23 +10,13 @@ from datetime import datetime , timedelta
 from airflow.utils.task_group import TaskGroup
 from groups.process_tasks import process_tasks
 
-"""class CustomPostgresOperator(PostgresOperator):
-    template_fields = ('sql', 'parameters')
 
-    def _extract(partner_name):
-    partner_settings = Variable.get("my_dag_partner", deserialize_json=True)
-    name = partner_settings["name"]
-    api_key = partner_settings["api_key"]
-    #ath = partner_settings["path"]
-    print(partner_name)"""
+
 
 @task.python(task_id="extract_partners",do_xcom_push=False,multiple_outputs=True)
-def extract():
-    partner_name = "netflix"
-    partner_path = "/partners/netflix"
-    #ti.xcom_push(key="partner_name", value=partner_name)
+def extract(partner_name,partner_path):
     return {"partner_name": partner_name,"partner_path": partner_path}
-    #return partner_name
+ 
 
 
 default_args = {
@@ -36,11 +26,35 @@ default_args = {
         default_args=default_args, schedule_interval="@daily",
         dagrun_timeout=timedelta(minutes=10), tags=["data_science"],
         catchup=False, max_active_runs=1)
+
+
 def my_dag():
-    
-    partner_settings = extract()
-    process_tasks(partner_settings)
-     
+
+    partners = {
+
+    "partner_snowflake":
+    {
+       "name": "snowflake",
+       "path": "/partners/snowflake"
+    },
+    "partner_netflix":
+    {
+       "name": "netflix",
+       "path": "/partners/netflix"
+    },
+    "partner_astronomer":
+    {
+       "name": "snowflake",
+       "path": "/partners/astronomer"
+    }
+
+}
+
+    for partners, details in partners.items():
+        process_tasks(extract(details['name'], details['path']))
+
+
+   
 my_dag()
 
     
