@@ -1,6 +1,6 @@
 from airflow.operators.dummy import DummyOperator
 from airflow import DAG
-from airflow.models.baseoperator import cross_downstream
+from airflow.models.baseoperator import cross_downstream , chain
 
 from datetime import datetime
 
@@ -17,3 +17,5 @@ default_args=default_args,catchup=False) as dag:
     t5 = DummyOperator(task_id="t5")
     t6 = DummyOperator(task_id="t6")
     cross_downstream([t1,t2,t3],[t4,t5,t6 ])
+
+    chain(t1, [t2,t3], [t4,t5], t6)
