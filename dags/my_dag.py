@@ -40,17 +40,20 @@ def my_dag():
     "partner_snowflake":
     {
        "name": "snowflake",
-       "path": "/partners/snowflake"
+       "path": "/partners/snowflake",
+       "priority": 2
     },
     "partner_netflix":
     {
        "name": "netflix",
-       "path": "/partners/netflix"
+       "path": "/partners/netflix",
+       "priority": 3
     },
     "partner_astronomer":
     {
        "name": "snowflake",
-       "path": "/partners/astronomer"
+       "path": "/partners/astronomer",
+       "priority": 1
     }
 
     
@@ -74,7 +77,7 @@ def my_dag():
 
     for partners, details in partners.items():
 
-        @task.python(task_id=f"extract_{partners}",do_xcom_push=False, pool='partner_pool',multiple_outputs=True)
+        @task.python(task_id=f"extract_{partners}", priority_weight=details['priority'],do_xcom_push=False, pool='partner_pool',multiple_outputs=True)
         def extract(partner_name,partner_path):
             time.sleep(3)
             return {"partner_name": partner_name,"partner_path": partner_path}
