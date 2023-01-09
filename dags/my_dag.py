@@ -14,7 +14,8 @@ import time
 
 
 default_args = {
-    "start_date": datetime(2021,1,1)
+    "start_date": datetime(2021,1,1),
+    "retries": 0
 }
 @dag(description= "DAG in charge of processing customer data",
         default_args=default_args, schedule_interval="@daily",
@@ -80,9 +81,10 @@ def my_dag():
 
     for partners, details in partners.items():
 
-        @task.python(task_id=f"extract_{partners}",priority_weight=details['priority'],do_xcom_push=False, pool=details['pool'],multiple_outputs=True)
+        @task.python(task_id=f"extract_{partners}",depends_on_past=True,priority_weight=details['priority'],do_xcom_push=False, pool=details['pool'],multiple_outputs=True)
         def extract(partner_name,partner_path):
             time.sleep(3)
+            raise ValueError("failed")
             return {"partner_name": partner_name,"partner_path": partner_path}
         extracted_values = extract(details['name'], details['path'])
         start >> extracted_values 
