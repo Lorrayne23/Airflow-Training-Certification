@@ -12,16 +12,38 @@ from groups.process_tasks import process_tasks
 from airflow.operators.dummy import DummyOperator
 import time
 from airflow.sensors.date_time import DateTimeSensor
+from airflow.exceptions import AirflowTaskTimeout, AirflowSensorTimeout
 
 
 default_args = {
     "start_date": datetime(2021,1,1),
     "retries": 0
 }
+
+
+def _success_callback(context):
+    print(context)
+
+def _failure_callback(context):
+    print(context)
+
+def _extract_callback_sucess(context):
+    print('SUCESS CALLBACK')
+
+def _extract_callback_failure(context):
+    """if(context['exception']):
+        if(isinstance (context['exception'], AirflowTaskTimeout)):
+        if(isinstance (context['exception'], AirflowTSensorTimeout)):"""
+    print('FAILURE CALLBACK')
+
+def _extract_callback_retry(context):
+    print(' RETRY CALLBACK')
+
+
 @dag(description= "DAG in charge of processing customer data",
         default_args=default_args, schedule_interval="@daily",
         dagrun_timeout=timedelta(minutes=10), tags=["data_science"],
-        catchup=False, max_active_runs=1)
+        catchup=False,on_success_callback=_success_callback, on_failure_callback=_failure_callback,max_active_runs=1)
 
 
 #def _choosing_partner_based_on_day(execution_date):
@@ -36,6 +58,11 @@ default_args = {
 
 
 def my_dag():
+
+
+    
+
+   
 
     partners = {
 
@@ -59,14 +86,10 @@ def my_dag():
        "path": "/partners/astronomer",
        "priority": 1,
        "pool": "astronomer"
-    }
-
-    
-
-
-
+    }    
 
 }
+
     start = DummyOperator(task_id="start", trigger_rule='dummy' , pool='default_pool', execution_timeout=timedelta(minutes=10))
 
     delay = DateTimeSensor(
@@ -94,7 +117,7 @@ def my_dag():
 
     for partners, details in partners.items():
 
-        @task.python(task_id=f"extract_{partners}",depends_on_past=True,priority_weight=details['priority'],do_xcom_push=False, pool=details['pool'],multiple_outputs=True)
+        @task.python(task_id=f"extract_{partners}",on_success_callback=_extract_callback_sucess,on_failure_callback=_extract_callback_failure, on_retry_callback=_extract_callback_retry,depends_on_past=True, priority_weight=details['priority'], do_xcom_push=False, pool=details['pool'],multiple_outputs=True)
         def extract(partner_name,partner_path):
             time.sleep(3)
             raise ValueError("failed")
