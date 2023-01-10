@@ -37,7 +37,8 @@ def _extract_callback_failure(context):
     print('FAILURE CALLBACK')
 
 def _extract_callback_retry(context):
-    print(' RETRY CALLBACK')
+    if(context['ti'].try_number() > 2 ):
+        print(' RETRY CALLBACK')
 
 
 @dag(description= "DAG in charge of processing customer data",
