@@ -118,7 +118,8 @@ def my_dag():
 
     for partners, details in partners.items():
 
-        @task.python(task_id=f"extract_{partners}",retries=3,retry_delay=timedelta(minutes=5),on_success_callback=_extract_callback_sucess,on_failure_callback=_extract_callback_failure, on_retry_callback=_extract_callback_retry,depends_on_past=True, priority_weight=details['priority'], do_xcom_push=False, pool=details['pool'],multiple_outputs=True)
+        @task.python(task_id=f"extract_{partners}",retries=3,retry_delay=timedelta(minutes=5 ),
+                     retry_exponential_backoff=True,on_success_callback=_extract_callback_sucess,on_failure_callback=_extract_callback_failure, on_retry_callback=_extract_callback_retry,depends_on_past=True, priority_weight=details['priority'], do_xcom_push=False, pool=details['pool'],multiple_outputs=True)
         def extract(partner_name,partner_path):
             time.sleep(3)
             raise ValueError("failed")
