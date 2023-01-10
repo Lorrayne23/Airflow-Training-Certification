@@ -11,6 +11,7 @@ from airflow.utils.task_group import TaskGroup
 from groups.process_tasks import process_tasks
 from airflow.operators.dummy import DummyOperator
 import time
+from airflow.sensors.date_time import DateTimeSensor
 
 
 default_args = {
@@ -67,6 +68,18 @@ def my_dag():
 
 }
     start = DummyOperator(task_id="start", trigger_rule='dummy' , pool='default_pool')
+
+    delay = DateTimeSensor(
+        task_id='delay',
+        target_time="{{execution_date.add(hours=9)}}",
+        poke_interval=60 * 60,
+        mode='reschedule',
+        timeout=60* 60 * 10,
+        #execution_timeout=
+        soft_fail=True,
+        exponential_backoff=True
+
+    )
 
     """choosing_partner_based_on_day = BrachPythonOperator(
         task_id = 'choosing_partner_based_on_day',
