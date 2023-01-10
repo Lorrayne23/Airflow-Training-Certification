@@ -67,7 +67,7 @@ def my_dag():
 
 
 }
-    start = DummyOperator(task_id="start", trigger_rule='dummy' , pool='default_pool')
+    start = DummyOperator(task_id="start", trigger_rule='dummy' , pool='default_pool', execution_timeout=timedelta(minutes=10))
 
     delay = DateTimeSensor(
         task_id='delay',
