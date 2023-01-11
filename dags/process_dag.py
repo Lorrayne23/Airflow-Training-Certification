@@ -13,13 +13,8 @@ with  DAG('process_dag', schedule_interval='@daily', default_args=default_args, 
     def t1():
         print("t1")
     
-
-    @task.python
-    def t2():
-        print("t2")
-
     @task.python
     def t3():
         print("t3")
 
-    t1() >> t2() >> t3()    
+    t1() >> t3()    
