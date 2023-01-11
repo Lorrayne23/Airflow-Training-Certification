@@ -40,11 +40,17 @@ def _extract_callback_retry(context):
     #if(context['ti'].try_number() > 2 ):
     print(' RETRY CALLBACK')
 
+def _sla_miss_callback(dag, task_list, blocking_task_list, slas, blocking_tis):
+    print(task_list)
+    print(blocking_tis)
+    print(slas)
+
+
 
 @dag(description= "DAG in charge of processing customer data",
         default_args=default_args, schedule_interval="@daily",
         dagrun_timeout=timedelta(minutes=10), tags=["data_science"],
-        catchup=False,on_success_callback=_success_callback, on_failure_callback=_failure_callback,max_active_runs=1)
+        catchup=False,on_success_callback=_success_callback,sla_miss_callback=_sla_miss_callback , on_failure_callback=_failure_callback,max_active_runs=1)
 
 
 #def _choosing_partner_based_on_day(execution_date):
@@ -119,6 +125,7 @@ def my_dag():
     for partners, details in partners.items():
 
         @task.python(task_id=f"extract_{partners}",retries=3,retry_delay=timedelta(minutes=5 ),
+                     sla=timedelta(minutes=5),
                      retry_exponential_backoff=True,max_retry_delay=timedelta(minutes=15),
                      on_success_callback=_extract_callback_sucess,on_failure_callback=_extract_callback_failure, on_retry_callback=_extract_callback_retry,depends_on_past=True, priority_weight=details['priority'], do_xcom_push=False, pool=details['pool'],multiple_outputs=True)
         def extract(partner_name,partner_path):
